@@ -1,0 +1,155 @@
+<html>
+
+<head>
+  <title>Snake Game</title>
+  <style>
+    /* CSS for the game board and snake */
+    #game-board {
+      width: 500px;
+      height: 500px;
+      background-color: #eee;
+      border: 1px solid black;
+      position: relative;
+    }
+
+    .snake-segment {
+      width: 20px;
+      height: 20px;
+      background-color: green;
+      position: absolute;
+    }
+
+    /* CSS for the food */
+    .food {
+      width: 20px;
+      height: 20px;
+      background-color: red;
+      position: absolute;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="game-board"></div>
+  <script>
+    // JavaScript for the Snake game
+    // Set up some variables for the game
+    let snake = [],
+      food,
+      score = 0,
+      direction = 'right',
+      gameOver = false,
+      gameBoard = document.getElementById('game-board');
+
+    // Set up the snake and food on the game board
+    function setup() {
+      // Create the snake segments and add them to the game board
+      for (let i = 0; i < 5; i++) {
+        let snakeSegment = document.createElement('div');
+        snakeSegment.classList.add('snake-segment');
+        snakeSegment.style.left = i * 20 + 'px';
+        snake.push(snakeSegment);
+        gameBoard.appendChild(snakeSegment);
+      }
+
+      // Create the food and add it to the game board
+      food = document.createElement('div');
+      food.classList.add('food');
+      gameBoard.appendChild(food);
+      placeFood();
+    }
+
+    // Place the food in a random location on the game board
+    function placeFood() {
+      let x = Math.floor(Math.random() * 25) * 20,
+        y = Math.floor(Math.random() * 25) * 20;
+      food.style.left = x + 'px';
+      food.style.top = y + 'px';
+    }
+
+    // Move the snake in the current direction
+    function move() {
+      // Add a new segment to the front of the snake
+      let newSegment = document.createElement('div');
+      newSegment.classList.add('snake-segment');
+      gameBoard.appendChild(newSegment);
+      snake.unshift(newSegment);
+
+      // Remove the last segment of the snake if the snake hasn't eaten any food
+      if (!hasEaten()) {
+        let lastSegment = snake.pop();
+        gameBoard.removeChild(lastSegment);
+      } else {
+        // If the snake has eaten food, increase the score and place new food on the game board
+        score++;
+        placeFood();
+      }
+
+      // Update the position of each snake segment based on the direction of the snake
+      for (let i = 0; i < snake.length; i++) {
+        let segment = snake[i];
+        if (direction === 'right') {
+          segment.style.left = segment.offsetLeft + 20 + 'px';
+          segment.style.top = segment.offsetTop + 'px';
+        } else if (direction === 'left') {
+          segment.style.left = segment.offsetLeft - 20 + 'px';
+          segment.style.top = segment.offsetTop + 'px';
+        } else if (direction === 'up') {
+          segment.style.left = segment.offsetLeft + 'px';
+          segment.style.top = segment.offsetTop - 20 + 'px';
+        } else if (direction === 'down') {
+          segment.style.left = segment.offsetLeft + 'px';
+          segment.style.top = segment.offsetTop + 20 + 'px';
+        }
+      }
+      // Check if the snake has collided with the walls or itself
+      if (hasCollided()) {
+        // gameOver = true;
+        // clearInterval(gameInterval);
+        // console.log('Game over! Your score is: ' + score);
+      }
+
+    }
+
+    // Check if the snake has eaten the food
+    function hasEaten() {
+      return snake[0].offsetLeft === food.offsetLeft && snake[0].offsetTop === food.offsetTop;
+    }
+
+    // Check if the snake has collided with the walls or itself
+    function hasCollided() {
+      // Check if the snake has collided with the walls
+      if (snake[0].offsetLeft < 0 || snake[0].offsetLeft >= 500 || snake[0].offsetTop < 0 || snake[0].offsetTop >= 500) {
+        return true;
+      }
+
+      // Check if the snake has collided with itself
+      for (let i = 1; i < snake.length; i++) {
+        if (snake[0].offsetLeft === snake[i].offsetLeft && snake[0].offsetTop === snake[i].offsetTop) {
+          return true;
+        }
+      }
+
+      return false;
+    }
+
+    // Set up the game and start the game loop
+    setup();
+    let gameInterval = setInterval(move, 500);
+
+    // Update the direction of the snake based on key presses
+    document.addEventListener('keydown', function (event) {
+      if (event.keyCode === 37 && direction !== 'right') {
+        direction = 'left';
+      } else if (event.keyCode === 38 && direction !== 'down') {
+        direction = 'up';
+      } else if (event.keyCode === 39 && direction !== 'left') {
+        direction = 'right';
+      } else if (event.keyCode === 40 && direction !== 'up') {
+        direction = 'down';
+      }
+    });
+  </script>
+</body>
+
+</html>
